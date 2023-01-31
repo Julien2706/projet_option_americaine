@@ -5,17 +5,19 @@
 #include "PricingResults.hpp"
 #include "BlackScholesModel.hpp"
 #include "jlparser/parser.hpp"
+#include "Option.hpp"
+#include "Basket.hpp"
+
 
 using namespace std;
 
 int main(int argc, char **argv)
 {
     double T, r, strike, rho;
-    PnlVect *spot, *sigma, *divid;
+    PnlVect *spot, *sigma, *divid, *lambda;
     string type;
     int size, nbTimesStep;
     int n_samples;
-
     char *infile = argv[1];
     Param *P = new Parser(infile);
 
@@ -24,6 +26,7 @@ int main(int argc, char **argv)
     P->extract("maturity", T);
     P->extract("model size", size);
     P->extract("spot", spot, size);
+    P->extract("payoff coefficients", lambda, size);
     P->extract("correlation", rho);
     P->extract("volatility", sigma, size);
     P->extract("interest rate", r);
@@ -34,7 +37,9 @@ int main(int argc, char **argv)
     P->extract("strike", strike);
     P->extract("MC iterations", n_samples);
 
-
+    if (type == "exchange"){
+        Basket *opt = new Basket(T, nbTimesStep, size, lambda, strike);
+    }
     PnlRng *rng = pnl_rng_create(PNL_RNG_MERSENNE);
     pnl_rng_sseed(rng, time(NULL));
     BlackScholesModel *mod = new BlackScholesModel(size, r, rho, sigma, divid, spot);
