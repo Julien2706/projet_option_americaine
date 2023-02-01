@@ -19,7 +19,7 @@ int main(int argc, char **argv)
     double T, r, strike, rho;
     PnlVect *spot, *sigma, *divid, *lambda;
     string type;
-    int size, nbTimesStep;
+    int size, nbTimesStep, deg;
     int n_samples;
     char *infile = argv[1];
     Param *P = new Parser(infile);
@@ -32,6 +32,7 @@ int main(int argc, char **argv)
     P->extract("correlation", rho);
     P->extract("volatility", sigma, size);
     P->extract("interest rate", r);
+    P->extract("degree for polynomial regression", deg);
     if (P->extract("dividend rate", divid, size, true) == false)
     {
         divid = pnl_vect_create_from_zero(size);
@@ -60,7 +61,7 @@ int main(int argc, char **argv)
     //PnlMat *path = pnl_mat_create(nbTimesStep +1, size);
     //pnl_mat_set_row(path, spot, 0);
     //mod->asset(path, T, nbTimesStep, rng);
-    MonteCarlo *mc = new MonteCarlo(mod, opt, 5);
+    MonteCarlo *mc = new MonteCarlo(mod, opt, 5, deg);
     mc->price();
     //pnl_mat_print(path);
     PnlVect *G = pnl_vect_new();

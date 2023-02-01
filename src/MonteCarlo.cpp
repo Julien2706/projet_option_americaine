@@ -2,10 +2,11 @@
 #include "pnl/pnl_basis.h"
 #include <ctime>
 
-MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, int nSample){
+MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, int nSample, int deg){
     this->mod_ = mod;
     this->opt_ = opt;
     this->nSample_ = nSample;
+    this->deg_ = deg;
 }
 
 double MonteCarlo::price(){
@@ -22,9 +23,14 @@ double MonteCarlo::price(){
             pnl_mat_set_row(All, vect_sub, j*nSample_ +i);
         }
     }
-    PnlBasis *pol = pnl_basis_create_from_degree (PNL_BASIS_HERMITE, , opt_->size_);
-    for(int i=opt_->dates_, i>0, i--){
-
+    PnlBasis *pol = pnl_basis_create_from_degree (PNL_BASIS_HERMITE, deg_, opt_->size_);
+    for(int i=opt_->dates_; i>0; i--){
+        PnlMat *M_sub = pnl_mat_create(nSample_, opt_->size_);
+        pnl_mat_extract_subblock(M_sub, All, i*nSample_, nSample_, 0, opt_->size_ );
+        PnlVect *vectPayoff = pnl_vect_create(nSample_);
+        for(int j=0; j< nSample_; j++){
+            pnl_vect_set(vectPayoff, j, opt_->payoff())
+        }
     }
 
 }
