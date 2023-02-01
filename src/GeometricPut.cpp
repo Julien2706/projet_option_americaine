@@ -11,17 +11,12 @@ GeometricPut::GeometricPut(double T, int dates, int size, double strike) {
     this->strike_ = strike;
 }
 
-double GeometricPut::payoff(const PnlMat *path, double time){
-    int line_indice = time/(this->T_/this->dates_);
-    PnlVect *line_i = pnl_vect_new();
-    pnl_mat_get_row(line_i, path, line_indice);
+double GeometricPut::payoff(const PnlVect *values){
     double prod =1;
-    for(int i=0; i<path->n; i++){
-        prod = prod * pnl_mat_get(path, line_indice, i);
+    for(int i=0; i<values->size; i++){
+        prod = prod * pnl_vect_get(values, i);
     }
-    
-    double denominateur = 1/path->n;
-    prod = pow(prod,1.0/path->n);
+    prod = pow(prod,1.0/values->size);
     double payoff = strike_ - prod;
     if (payoff > 0 ){
         return payoff;

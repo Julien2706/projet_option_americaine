@@ -61,12 +61,12 @@ int main(int argc, char **argv)
     //PnlMat *path = pnl_mat_create(nbTimesStep +1, size);
     //pnl_mat_set_row(path, spot, 0);
     //mod->asset(path, T, nbTimesStep, rng);
-    MonteCarlo *mc = new MonteCarlo(mod, opt, 5, deg);
-    mc->price();
+    MonteCarlo *mc = new MonteCarlo(mod, opt, n_samples, deg);
+    double price = mc->price();
     //pnl_mat_print(path);
     PnlVect *G = pnl_vect_new();
     //double price = opt->payoff(path, 2*T/nbTimesStep);
-    //cout << price << endl;
+    cout << price << endl;
 
     int M = 1E5;
     int dim = 2;
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 
     acc /= M;
 
-    cout << PricingResults(acc) << endl;
+    cout << PricingResults(price) << endl;
 
 
     pnl_vect_free(&G);

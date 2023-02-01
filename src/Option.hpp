@@ -19,7 +19,7 @@ public:
      * par la fonction asset.
      * @return phi(trajectoire)
      */
-    virtual double payoff(const PnlMat *path, double time) = 0;
+    virtual double payoff(const PnlVect *values) = 0;
 };
 
 

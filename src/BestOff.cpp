@@ -11,14 +11,11 @@ BestOff::BestOff(double T, int dates, int size, PnlVect *lambda, double strike) 
     this->strike_ = strike;
 }
 
-double BestOff::payoff(const PnlMat *path, double time){
-    int line_indice = time/(this->T_/this->dates_);
-    PnlVect *line_i = pnl_vect_new();
-    pnl_mat_get_row(line_i, path, line_indice);
+double BestOff::payoff(const PnlVect *values){
     double maxi = 0.;
     double current;
-    for(int i=0; i<path->n; i++){
-        current =  pnl_mat_get(path, line_indice, i) * pnl_vect_get(lambda_, i) ;
+    for(int i=0; i<values->size; i++){
+        current =  pnl_vect_get(values, i) * pnl_vect_get(lambda_, i) ;
         if(current>maxi){
             maxi=current;
         }

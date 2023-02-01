@@ -23,5 +23,5 @@ public:
    * par la fonction asset.
    * @return phi(trajectoire)
    */
-  double payoff(const PnlMat *path, double time) override;
+  double payoff(const PnlVect *values) override;
 };
