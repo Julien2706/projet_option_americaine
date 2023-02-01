@@ -1,6 +1,9 @@
 #include "MonteCarlo.hpp"
 #include "pnl/pnl_basis.h"
 #include <ctime>
+#include <iostream>
+
+using namespace std;
 
 MonteCarlo::MonteCarlo(BlackScholesModel *mod, Option *opt, int nSample, int deg){
     this->mod_ = mod;
@@ -37,7 +40,7 @@ double MonteCarlo::price(){
         for(int j=0; j< nSample_; j++){
             double ta_l = pnl_vect_get(ta,j);
             pnl_mat_get_row(saveRow, All, nSample_*ta_l + j);
-            pnl_vect_set(vectPayoff, j, opt_->payoff(saveRow)*exp(-mod_->r_ * ta_l*(opt_->T_/opt_->dates_)));
+            pnl_vect_set(vectPayoff, j, opt_->payoff(saveRow));
         }
 
         // Calcul des alphas
@@ -46,12 +49,14 @@ double MonteCarlo::price(){
 
         for(int j=0; j< nSample_; j++){
             pnl_mat_get_row(saveRow, All, nSample_*i + j);
-            double payoff_l = opt_->payoff(saveRow)*exp(-mod_->r_ * i*(opt_->T_/opt_->dates_));
+            double payoff_l = opt_->payoff(saveRow);
             double eval_pol = pnl_basis_eval_vect (pol, alpha,saveRow);
-            if(payoff_l>=eval_pol && eval_pol>=0 ){
+            if((payoff_l>=eval_pol) && (eval_pol>=0 )){
                 pnl_vect_set(ta,j,i);
             }
         }
+        //cout << " date i : "<< i << endl;
+        //pnl_vect_print(ta);
         pnl_vect_free(&saveRow);
         pnl_vect_free(&alpha);
         pnl_vect_free(&vectPayoff);
@@ -65,7 +70,7 @@ double MonteCarlo::price(){
     for(int j=0; j< nSample_; j++){
         double ta_l = pnl_vect_get(ta,j);
         pnl_mat_get_row(saveRow, All, nSample_*ta_l + j);
-        double payoff_l = opt_->payoff(saveRow)*exp(-mod_->r_ * (opt_->T_/opt_->dates_));
+        double payoff_l = opt_->payoff(saveRow);
         sum += payoff_l;
     }
 
