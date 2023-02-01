@@ -41,7 +41,7 @@ double MonteCarlo::price(){
         }
 
         // Calcul des alphas
-        PnlVect* alpha = pnl_vect_create(1);
+        PnlVect* alpha = pnl_vect_create(0);
         pnl_basis_fit_ls(pol, alpha, M_sub, vectPayoff);
 
         for(int j=0; j< nSample_; j++){
@@ -67,6 +67,9 @@ double MonteCarlo::price(){
         double payoff_l = opt_->payoff(saveRow)*exp(-mod_->r_ * (opt_->T_/opt_->dates_));
         sum += payoff_l;
     }
+
+    pnl_rng_free(&rng);
+
     if(payoff_0>sum/nSample_){
         return payoff_0;
     }
