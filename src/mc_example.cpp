@@ -9,7 +9,7 @@
 #include "Basket.hpp"
 #include "GeometricPut.hpp"
 #include "BestOff.hpp"
-
+#include "MonteCarlo.hpp"
 
 
 using namespace std;
@@ -57,14 +57,15 @@ int main(int argc, char **argv)
     PnlRng *rng = pnl_rng_create(PNL_RNG_MERSENNE);
     pnl_rng_sseed(rng, time(NULL));
     BlackScholesModel *mod = new BlackScholesModel(size, r, rho, sigma, divid, spot);
-    PnlMat *path = pnl_mat_create(nbTimesStep +1, size);
-    pnl_mat_set_row(path, spot, 0);
-    mod->asset(path, T, nbTimesStep, rng);
-    
-    pnl_mat_print(path);
+    //PnlMat *path = pnl_mat_create(nbTimesStep +1, size);
+    //pnl_mat_set_row(path, spot, 0);
+    //mod->asset(path, T, nbTimesStep, rng);
+    MonteCarlo *mc = new MonteCarlo(mod, opt, 5);
+    mc->price();
+    //pnl_mat_print(path);
     PnlVect *G = pnl_vect_new();
-    double price = opt->payoff(path, 2*T/nbTimesStep);
-    cout << price << endl;
+    //double price = opt->payoff(path, 2*T/nbTimesStep);
+    //cout << price << endl;
 
     int M = 1E5;
     int dim = 2;
@@ -84,7 +85,7 @@ int main(int argc, char **argv)
 
 
     pnl_vect_free(&G);
-    pnl_mat_free(&path);
+    //pnl_mat_free(&path);
     pnl_rng_free(&rng);
     return 0;
 }
