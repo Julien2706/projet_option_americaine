@@ -59,6 +59,11 @@ int main(int argc, char **argv)
     double price = mc->price();
 
     cout << PricingResults(price) << endl;
-
+    pnl_vect_free(&spot);
+    pnl_vect_free(&sigma);
+    pnl_vect_free(&divid);
+    if (type != "geometric_put"){
+        pnl_vect_free(&lambda);
+    }
     return 0;
 }

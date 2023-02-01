@@ -39,7 +39,7 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimesStep, PnlRng *r
         for (int d=0; d<numberAsset; d++){
             
             pnl_mat_get_row(lineD,M,d);
-            double arg = (this->r_ - pnl_vect_get(this->divid, d) - pnl_vect_scalar_prod(this->sigma_, this->sigma_)/2)*(timeIntervalle) + pnl_vect_get(this->sigma_,d)*pnl_vect_scalar_prod(lineD, gaussien)*sqrt(timeIntervalle);
+            double arg = (this->r_ - pnl_vect_get(this->divid, d) - (pnl_vect_get(this->sigma_,d)*pnl_vect_get(this->sigma_,d))/2)*(timeIntervalle) + pnl_vect_get(this->sigma_,d)*pnl_vect_scalar_prod(lineD, gaussien)*sqrt(timeIntervalle);
             double expo = exp(arg);
             double out = pnl_mat_get(path,i, d) * expo;
             pnl_mat_set(path, i+1, d, out);
@@ -47,5 +47,7 @@ void BlackScholesModel::asset(PnlMat *path, double T, int nbTimesStep, PnlRng *r
         }
     }
     pnl_vect_free(&lineD);
+    pnl_vect_free(&gaussien);
+    pnl_mat_free(&M);
 }
 
