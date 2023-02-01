@@ -26,10 +26,10 @@ double MonteCarlo::price(){
     PnlBasis *pol = pnl_basis_create_from_degree (PNL_BASIS_HERMITE, deg_, opt_->size_);
     // Vecteur de tps d'arret
     PnlVect* ta = pnl_vect_create_from_scalar(nSample_,opt_->dates_);
-    for(int i=opt_->dates_; i>0; i--){
+    for(int i=opt_->dates_-1; i>0; i--){
         //Matrice x de la methode basis
         PnlMat *M_sub = pnl_mat_create(nSample_, opt_->size_);
-        pnl_mat_extract_subblock(M_sub, All, (i-1)*nSample_, nSample_, 0, opt_->size_ );
+        pnl_mat_extract_subblock(M_sub, All, i*nSample_, nSample_, 0, opt_->size_ );
 
         //Calcul du payoff
         PnlVect *vectPayoff = pnl_vect_create(nSample_);
@@ -37,7 +37,7 @@ double MonteCarlo::price(){
         for(int j=0; j< nSample_; j++){
             double ta_l = pnl_vect_get(ta,j);
             pnl_mat_get_row(saveRow, All, nSample_*ta_l + j);
-            pnl_vect_set(vectPayoff, j, opt_->payoff(saveRow));
+            pnl_vect_set(vectPayoff, j, opt_->payoff(saveRow)*exp(-mod_->r_ * ta_l*(opt_->T_/opt_->dates_)));
         }
 
         // Calcul des alphas
@@ -45,11 +45,11 @@ double MonteCarlo::price(){
         pnl_basis_fit_ls(pol, alpha, M_sub, vectPayoff);
 
         for(int j=0; j< nSample_; j++){
-            pnl_mat_get_row(saveRow, All, nSample_*(i-1) + j);
-            double payoff_l = opt_->payoff(saveRow);
+            pnl_mat_get_row(saveRow, All, nSample_*i + j);
+            double payoff_l = opt_->payoff(saveRow)*exp(-mod_->r_ * i*(opt_->T_/opt_->dates_));
             double eval_pol = pnl_basis_eval_vect (pol, alpha,saveRow);
             if(payoff_l>=eval_pol && eval_pol>=0 ){
-                pnl_vect_set(ta,j,i-1);
+                pnl_vect_set(ta,j,i);
             }
         }
         pnl_vect_free(&saveRow);
@@ -64,7 +64,7 @@ double MonteCarlo::price(){
     for(int j=0; j< nSample_; j++){
         double ta_l = pnl_vect_get(ta,j);
         pnl_mat_get_row(saveRow, All, nSample_*ta_l + j);
-        double payoff_l = opt_->payoff(saveRow);
+        double payoff_l = opt_->payoff(saveRow)*exp(-mod_->r_ * (opt_->T_/opt_->dates_));
         sum += payoff_l;
     }
     if(payoff_0>sum/nSample_){
