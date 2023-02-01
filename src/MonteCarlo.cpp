@@ -18,7 +18,7 @@ double MonteCarlo::price(){
         pnl_mat_set_row(simul, mod_->spot_, 0);
         mod_->asset(simul, opt_->T_, opt_->dates_, rng);
         PnlVect *vect_sub = pnl_vect_create(opt_->size_);
-        for(int j=0; j< opt_->dates_+1; j++){
+        for(int j=0; j<opt_->dates_+1; j++){
             pnl_mat_get_row(vect_sub, simul, j);
             pnl_mat_set_row(All, vect_sub, j*nSample_ +i);
         }
@@ -53,7 +53,8 @@ double MonteCarlo::price(){
             }
         }
         pnl_vect_free(&saveRow);
-
+        pnl_vect_free(&alpha);
+        pnl_vect_free(&vectPayoff);
     }
 
     PnlVect* saveRow = pnl_vect_create(opt_->size_);
