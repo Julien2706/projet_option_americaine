@@ -2,8 +2,8 @@
 #include "pnl/pnl_matrix.h"
 #include "Option.hpp"
 
-/// \brief Classe Basket 
-class Basket : public Option
+/// \brief Classe Option abstraite
+class GeometricPut : public Option
 {
 public:
   // double T_;        /// maturité
@@ -12,9 +12,9 @@ public:
   PnlVect *lambda_;
   double strike_;
 
-  Basket(double T, int dates, int size, PnlVect *lambda, double strike);
+  GeometricPut(double T, int dates, int size, double strike);
 
-  ~Basket();
+  ~GeometricPut();
   /**
    * Calcule la valeur du payoff sur la trajectoire
    *

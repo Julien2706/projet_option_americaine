@@ -12,7 +12,7 @@ Basket::Basket(double T, int dates, int size, PnlVect *lambda, double strike) {
 }
 
 double Basket::payoff(const PnlMat *path, double time){
-    double line_indice = time/(this->T_/this->dates_);
+    int line_indice = time/(this->T_/this->dates_);
     PnlVect *line_i = pnl_vect_new();
     pnl_mat_get_row(line_i, path, line_indice);
     double payoff = pnl_vect_scalar_prod(lambda_, line_i) - strike_;

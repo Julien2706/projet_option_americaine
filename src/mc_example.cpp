@@ -7,6 +7,9 @@
 #include "jlparser/parser.hpp"
 #include "Option.hpp"
 #include "Basket.hpp"
+#include "GeometricPut.hpp"
+#include "BestOff.hpp"
+
 
 
 using namespace std;
@@ -26,7 +29,6 @@ int main(int argc, char **argv)
     P->extract("maturity", T);
     P->extract("model size", size);
     P->extract("spot", spot, size);
-    P->extract("payoff coefficients", lambda, size);
     P->extract("correlation", rho);
     P->extract("volatility", sigma, size);
     P->extract("interest rate", r);
@@ -37,9 +39,21 @@ int main(int argc, char **argv)
     P->extract("strike", strike);
     P->extract("MC iterations", n_samples);
 
+    Option* opt;
+
     if (type == "exchange"){
-        Basket *opt = new Basket(T, nbTimesStep, size, lambda, strike);
+        P->extract("payoff coefficients", lambda, size);
+        opt = new Basket(T, nbTimesStep, size, lambda, strike);
     }
+    else if (type == "geometric_put"){
+        opt = new GeometricPut(T, nbTimesStep, size, strike);
+    }
+    else if (type == "bestof"){
+        P->extract("payoff coefficients", lambda, size);
+        opt = new BestOff(T, nbTimesStep, size, lambda, strike);
+    }
+
+
     PnlRng *rng = pnl_rng_create(PNL_RNG_MERSENNE);
     pnl_rng_sseed(rng, time(NULL));
     BlackScholesModel *mod = new BlackScholesModel(size, r, rho, sigma, divid, spot);
@@ -48,9 +62,9 @@ int main(int argc, char **argv)
     mod->asset(path, T, nbTimesStep, rng);
     
     pnl_mat_print(path);
-    
     PnlVect *G = pnl_vect_new();
-    
+    double price = opt->payoff(path, 2*T/nbTimesStep);
+    cout << price << endl;
 
     int M = 1E5;
     int dim = 2;
@@ -68,7 +82,9 @@ int main(int argc, char **argv)
 
     cout << PricingResults(acc) << endl;
 
+
     pnl_vect_free(&G);
+    pnl_mat_free(&path);
     pnl_rng_free(&rng);
     return 0;
 }
